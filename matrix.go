@@ -100,11 +100,11 @@ func (matrix Matrix) IsSquare() bool {
 
 // Size returns a size object containing the number of rows and columns of the matrix
 func (matrix Matrix) Size() Size {
-	h := cap(matrix)
+	h := len(matrix)
 	if h == 0 {
 		return Size{Rows: 0, Columns: 0}
 	}
-	return Size{Rows: h, Columns: cap(matrix[0])}
+	return Size{Rows: h, Columns: len(matrix[0])}
 }
 
 // Insert inserts a value into the matrix and returns the result
@@ -114,14 +114,14 @@ func (matrix Matrix) Insert(row, column int, value float64) Matrix {
 	size := matrix.Size()
 
 	if row > size.Rows-1 {
-		for i := cap(filledMatrix); i <= row; i++ {
+		for i := len(filledMatrix); i <= row; i++ {
 			filledMatrix = append(filledMatrix, UnitSlice(0, size.Rows))
 		}
 	}
 
 	if column > size.Columns-1 {
 		for ind, row := range filledMatrix {
-			for i := cap(row); i <= column; i++ {
+			for i := len(row); i <= column; i++ {
 				filledMatrix[ind] = append(filledMatrix[ind], 0)
 			}
 		}
@@ -333,6 +333,7 @@ func (matrix Matrix) Echelon() Matrix {
 		}
 
 		i := row
+		println(fmt.Sprintf("%F", echelonForm[i][lead]))
 		for echelonForm[i][lead] == 0 {
 			i++
 			if rowCount == i {
