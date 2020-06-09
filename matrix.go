@@ -327,8 +327,8 @@ func (matrix Matrix) Echelon() Matrix {
 	rowCount := matrix.Size().Rows
 	columnCount := matrix.Size().Columns
 
-	for row := 0; row < columnCount; row++ {
-		if lead >= columnCount {
+	for row := 0; row < rowCount; row++ {
+		if lead >= rowCount {
 			break
 		}
 
