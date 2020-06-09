@@ -205,7 +205,7 @@ func (matrix Matrix) Reflect() (Matrix, error) {
 
 // Submatrix removes a given set of rows and columns from the matrix and returns the result
 func (matrix Matrix) Submatrix(rows, columns []int) Matrix {
-	collapsedMatrix := NewMatrix(matrix.Size().Rows-len(rows), matrix.Size().Columns-len(columns))
+	subMatrix := NewMatrix(matrix.Size().Rows-len(rows), matrix.Size().Columns-len(columns))
 	rowsSkipped := 0
 
 	for row := range matrix {
@@ -219,10 +219,10 @@ func (matrix Matrix) Submatrix(rows, columns []int) Matrix {
 				columnsSkipped++
 				continue
 			}
-			collapsedMatrix[row-rowsSkipped][column-columnsSkipped] = matrix[row][column]
+			subMatrix[row-rowsSkipped][column-columnsSkipped] = matrix[row][column]
 		}
 	}
-	return collapsedMatrix
+	return subMatrix
 }
 
 // ApplySigns applies the signs needed for finding the adjoint of the matrix to the matrix and returns the result
