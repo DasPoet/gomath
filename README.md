@@ -47,7 +47,7 @@ gomath.NewMatrix(m, n)
 <div align="center"
 >
 <img
-    src="https://latex.codecogs.com/svg.latex?\color{white} \begin {bmatrix}i_{0,0} & ... & i_{0,n} \\...  & ... &  ...    \\i_{m,0} & ... & i_{m,n}\end {bmatrix}"/>
+    src="https://latex.codecogs.com/svg.latex?\color{white}%20\begin%20{bmatrix}i_{0,0}%20&%20...%20&%20i_{0,n}%20\\...%20%20&%20...%20&%20%20...%20%20%20%20\\i_{m,0}%20&%20...%20&%20i_{m,n}\end%20{bmatrix"/>
 </div>
 
 Constructing a new square matrix
