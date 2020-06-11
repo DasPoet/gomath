@@ -46,8 +46,8 @@ func NewSquareMatrix(order int) Matrix {
 	return NewMatrix(order, order)
 }
 
-// NewUnitSquareMatrix returns a new square matrix with all elements set to a given element
-func NewUnitSquareMatrix(order int, element float64) Matrix {
+// NewFilledSquareMatrix returns a new square matrix with all elements set to a given element
+func NewFilledSquareMatrix(order int, element float64) Matrix {
 	return NewFilledMatrix(order, order, element)
 }
 
@@ -93,18 +93,18 @@ func (matrix Matrix) Copy() Matrix {
 	return copiedMatrix
 }
 
-// IsSquare returns whether matrix is a square matrix
+// IsSquare returns whether the matrix is a square matrix
 func (matrix Matrix) IsSquare() bool {
 	return matrix.Size().Rows == matrix.Size().Columns
 }
 
 // Size returns a size object containing the number of rows and columns of the matrix
-func (matrix Matrix) Size() Size {
+func (matrix Matrix) Size() *Size {
 	h := len(matrix)
 	if h == 0 {
-		return Size{Rows: 0, Columns: 0}
+		return &Size{Rows: 0, Columns: 0}
 	}
-	return Size{Rows: h, Columns: len(matrix[0])}
+	return &Size{Rows: h, Columns: len(matrix[0])}
 }
 
 // Insert inserts a value into the matrix and returns the result
@@ -154,6 +154,16 @@ func (matrix Matrix) InsertRow(afterRow int, row []float64) Matrix {
 	return filledMatrix
 }
 
+// ValueAt returns the i'th value of the matrix
+func (matrix Matrix) ValueAt(i int) float64 {
+	return matrix[i/matrix.Size().Columns][i%matrix.Size().Columns]
+}
+
+// SetValueAt sets the i'th value of the matrix to value
+func (matrix Matrix) SetValueAt(i int, value float64) {
+	matrix[i/matrix.Size().Columns][i%matrix.Size().Columns] = value
+}
+
 // Multiply returns the matrix multiplied by another matrix
 func (matrix Matrix) Multiply(other Matrix) (Matrix, error) {
 	matrixSize := matrix.Size()
@@ -201,6 +211,11 @@ func (matrix Matrix) Reflect() (Matrix, error) {
 		}
 	}
 	return reflectedMatrix, nil
+}
+
+// Len returns the number of elements in the matrix
+func (matrix Matrix) Len() int {
+	return matrix.Size().Rows * matrix.Size().Columns
 }
 
 // Submatrix removes a given set of rows and columns from the matrix and returns the result
@@ -318,44 +333,53 @@ func (matrix Matrix) Augment(other Matrix) Matrix {
 	return augmentedMatrix
 }
 
-// Echelon returns the row reduced echelon form of the matrix
+// Echelon returns the row reduced echelon form of the matrix. This is the form obtained by operating Gaussian
+// elimination on the columns of the matrix. Therefore, Echelon can be used to find solutions to systems of linear equations
 func (matrix Matrix) Echelon() Matrix {
 	echelonForm := matrix.Copy()
 
-	lead := 0
-
-	rowCount := matrix.Size().Rows
 	columnCount := matrix.Size().Columns
+	numElements := matrix.Len()
 
-	for row := 0; row < rowCount; row++ {
-		if lead >= rowCount {
+	lead := 0
+	for i := 0; i < numElements; i += columnCount {
+		if lead >= columnCount {
 			break
 		}
 
-		i := row
-		println(fmt.Sprintf("%F", echelonForm[i][lead]))
-		for echelonForm[i][lead] == 0 {
-			i++
-			if rowCount == i {
-				i = row
+		j := i
+		for matrix.ValueAt(j+lead) == 0 {
+			j += columnCount
+			if j == numElements {
+				j = i
 				lead++
-				if columnCount == lead {
-					break
+				if lead == columnCount {
+					return echelonForm
 				}
 			}
 		}
 
-		echelonForm[i], echelonForm[row] = echelonForm[row], echelonForm[i]
-		f := 1 / echelonForm[row][lead]
-		for j := range echelonForm[row] {
-			echelonForm[row][j] *= f
+		for c, ix, rx := 0, j, i; c < columnCount; c++ {
+			echelonForm[ix/columnCount][ix%columnCount], echelonForm[rx/columnCount][rx%columnCount] = echelonForm[rx/columnCount][rx%columnCount], echelonForm[ix/columnCount][ix%columnCount]
+			ix++
+			rx++
 		}
 
-		for i := 0; i < rowCount; i++ {
-			if i != row {
-				f = echelonForm[i][lead]
-				for j, el := range echelonForm[row] {
-					echelonForm[i][j] -= el * f
+		if d := echelonForm.ValueAt(i + lead); d != 0 {
+			d := 1 / d
+			for c, rx := 0, i; c < columnCount; c++ {
+				echelonForm.SetValueAt(rx, echelonForm.ValueAt(rx)*d)
+				rx++
+			}
+		}
+
+		for j = 0; j < numElements; j += columnCount {
+			if j != i {
+				f := echelonForm.ValueAt(j+lead)
+				for c, ix, rx := 0, j, i; c < columnCount; c++ {
+					echelonForm.SetValueAt(ix, echelonForm.ValueAt(ix) - echelonForm.ValueAt(rx) * f)
+					ix++
+					rx++
 				}
 			}
 		}
