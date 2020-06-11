@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # gomath
 
 <div
@@ -44,16 +43,6 @@ Constructing a new matrix
 ```golang
 gomath.NewMatrix(m, n)
 ```
-
-$$
-\begin {bmatrix}
-
-i_{0,0} & ... & i_{0,n} \\
-   ...  & ... &  ...    \\
-i_{m,0} & ... & i_{m,n}
-
-\end {bmatrix}
-$$
 
 <div align="center"
 >
