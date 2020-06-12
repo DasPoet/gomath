@@ -19,3 +19,4 @@ go.sum
 
 # IntelliJ
 .idea
+/gomath.code-workspace

@@ -3,6 +3,7 @@ package gomath
 import (
 	"errors"
 	"fmt"
+	"math"
 )
 
 // CONCEPT
@@ -162,6 +163,26 @@ func (matrix Matrix) ValueAt(i int) float64 {
 // SetValueAt sets the i'th value of the matrix to value
 func (matrix Matrix) SetValueAt(i int, value float64) {
 	matrix[i/matrix.Size().Columns][i%matrix.Size().Columns] = value
+}
+
+// DivideRows returns the two submatrices obtained by splitting the matrix after a given row
+// DivideRows(i) will produce two submatrices containing the rows 0 to i and i+1 to len(matrix) respectively
+func (matrix Matrix) DivideRows(afterRow int) (Matrix, Matrix) {
+	return matrix[:afterRow+1], matrix[afterRow+1:]
+}
+
+// DivideColumns returns the two submatrices obtained by splitting the matrix after a given column
+// DivideColumns(i) will produce two submatrices containing the columns 0 to i and i+1 to len(matrix) respectively
+func (matrix Matrix) DivideColumns(afterColumn int) (Matrix, Matrix) {
+	left, right := make([][]float64, matrix.Size().Rows), make([][]float64, matrix.Size().Rows)
+
+	for row := range matrix {
+		left[row], right[row] = make([]float64, afterColumn), make([]float64, matrix.Size().Columns-1-afterColumn)
+		left[row] = matrix[row][:afterColumn+1]
+		right[row] = matrix[row][afterColumn+1:]
+	}
+
+	return left, right
 }
 
 // Multiply returns the matrix multiplied by another matrix
@@ -348,7 +369,7 @@ func (matrix Matrix) Echelon() Matrix {
 		}
 
 		j := i
-		for matrix.ValueAt(j+lead) == 0 {
+		for math.Round(echelonForm.ValueAt(j+lead)) == 0 {
 			j += columnCount
 			if j == numElements {
 				j = i
@@ -375,9 +396,9 @@ func (matrix Matrix) Echelon() Matrix {
 
 		for j = 0; j < numElements; j += columnCount {
 			if j != i {
-				f := echelonForm.ValueAt(j+lead)
+				f := echelonForm.ValueAt(j + lead)
 				for c, ix, rx := 0, j, i; c < columnCount; c++ {
-					echelonForm.SetValueAt(ix, echelonForm.ValueAt(ix) - echelonForm.ValueAt(rx) * f)
+					echelonForm.SetValueAt(ix, echelonForm.ValueAt(ix)-echelonForm.ValueAt(rx)*f)
 					ix++
 					rx++
 				}
