@@ -369,7 +369,8 @@ func (matrix Matrix) Echelon() Matrix {
 		}
 
 		j := i
-		for math.Round(echelonForm.ValueAt(j+lead)) == 0 {
+
+		for val := math.Abs(echelonForm.ValueAt(j + lead)); val >= 0 && val < 0.0000001; {
 			j += columnCount
 			if j == numElements {
 				j = i
